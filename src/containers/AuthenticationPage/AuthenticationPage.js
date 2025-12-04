@@ -578,6 +578,7 @@ export const AuthenticationPageComponent = props => {
   const user = ensureCurrentUser(currentUser);
   const currentUserLoaded = !!user.id;
   const isLogin = tab === 'login';
+  const currentUserType = user.id?.uuid ? user.attributes.profile.publicData.userType : null;
 
   // We only want to show the email verification dialog in the signup
   // tab if the user isn't being redirected somewhere else
@@ -616,6 +617,10 @@ export const AuthenticationPageComponent = props => {
     // Already authenticated, redirect back to the page the user tried to access
     return <Redirect to={from} />;
   } else if (shouldRedirectToLandingPage) {
+    if (currentUserType === 'creator') {
+      return <NamedRedirect name="ManageProfilePage" />;
+    }
+
     // Already authenticated, redirect to the landing page (this was direct access to /login or /signup)
     return <NamedRedirect name="LandingPage" />;
   } else if (show404) {
@@ -665,6 +670,7 @@ export const AuthenticationPageComponent = props => {
               onResendVerificationEmail={onResendVerificationEmail}
               resendErrorMessage={resendErrorMessage}
               sendVerificationEmailInProgress={sendVerificationEmailInProgress}
+              currentUserType={currentUserType}
             />
           ) : (
             <AuthenticationOrConfirmInfoForm
